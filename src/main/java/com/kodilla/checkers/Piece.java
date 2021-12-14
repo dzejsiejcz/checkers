@@ -11,10 +11,12 @@ public class Piece extends StackPane {
 
     private int row;
     private int col;
-
     private PieceType type;
+    private boolean isBeating = false;
 
     private double mouseX, mouseY;
+
+
 
 
     public Piece( PieceType type, int col, int row) {
@@ -55,6 +57,10 @@ public class Piece extends StackPane {
         return type;
     }
 
+    public boolean isBeating() {
+        return isBeating;
+    }
+
     public void setRow(int row) {
         this.row = row;
     }
@@ -63,8 +69,31 @@ public class Piece extends StackPane {
         this.col = col;
     }
 
-    public void setType(PieceType type) {
-        this.type = type;
+    public void setBeating(Field[][] table) {
+        if (type == PieceType.WHITE) {
+            if (table[col-1][row-1].getPiece().getType()==PieceType.RED
+                    || table[col+1][row-1].getPiece().getType()==PieceType.RED){
+                isBeating = true;
+            } else {
+                isBeating = false;
+            }
+        } else if (type == PieceType.RED) {
+            if (table[col - 1][row + 1].getPiece().getType() == PieceType.WHITE
+                    || table[col + 1][row + 1].getPiece().getType() == PieceType.WHITE) {
+                isBeating = true;
+            } else {
+                isBeating = false;
+            }
+        }
     }
 
+    @Override
+    public String toString() {
+        return "Piece{" +
+                "row=" + row +
+                ", col=" + col +
+                ", type=" + type +
+                ", isBeating=" + isBeating +
+                '}';
+    }
 }

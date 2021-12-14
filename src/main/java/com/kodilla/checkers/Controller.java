@@ -1,16 +1,19 @@
 package com.kodilla.checkers;
 
-import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.kodilla.checkers.Checkers.*;
-import static java.lang.Math.round;
+import static com.kodilla.checkers.MoveType.*;
+import static java.lang.Math.abs;
+
 
 public class Controller {
 
     public static  Controller INSTANCE = new Controller();
     private final List<Field> fields = new ArrayList<>();
+
 
 
     private Controller(){}
@@ -19,16 +22,53 @@ public class Controller {
         this.fields.add(field);
     }
 
-//    public void click(Field field) {
-//        int col = field.getCol();
-//        int row = field.getRow();
-//        System.out.println("Field clicked col= " + col + ", row= " + row);
-//        field.setStyle("-fx-background-color : #008000;");
-//
-//        fields.stream()
-//                .filter(f -> f.getCol() == col+1 && f.getRow() == row)
-//                .forEach(f -> f.setStyle("-fx-background-color : #000000;"));
-//    }
+    public MoveType checkMove(Piece piece, int newCol, int newRow) {
+
+        if (newCol<0 || newRow<0 || newCol>=WIDTH || newRow>=HEIGHT){
+            return FORBIDDEN;
+        }
+        Field newField = Checkers.table[newCol][newRow];
+        if (newField.getColor().equals(COLOR_WHITE) || newField.hasPiece()){
+            return FORBIDDEN;
+        }
+        int deltaY = newRow - piece.getRow();
+        if (piece.getType() == PieceType.WHITE && deltaY>0) {
+            return FORBIDDEN;
+        }
+        if (piece.getType() == PieceType.RED && deltaY<0) {
+            return FORBIDDEN;
+        }
+        int deltaX = newCol - piece.getCol();
+        /**
+         *
+         *
+         */
+        if (abs(deltaX) == 1 && abs(deltaY) == 1 && !piece.isBeating()) {
+            return NORMAL;
+        }
+        if (abs(deltaX) == 2 && abs(deltaY) == 2 && piece.isBeating()) {
+            return NORMAL; //zmienić na KILLING
+        }
+
+
+
+
+        return FORBIDDEN;
+    }
+
+    public void checkBeating () {
+        Field field;
+        for (int x=0; x<WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                field = table[x][y];
+                if (field.hasPiece()) {
+                    field.getPiece().setBeating(table);
+                }
+            }
+        }
+    }
+
+
 
 
 

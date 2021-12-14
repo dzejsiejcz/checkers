@@ -1,8 +1,7 @@
 package com.kodilla.checkers;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +30,7 @@ public class Checkers extends Application {
     private Group fields = new Group();
     private Group pieces = new Group();
 
-    public Field[][] table = new Field[WIDTH][HEIGHT];
+    public static Field[][] table = new Field[WIDTH][HEIGHT];
 
 
     private Parent createTable() {
@@ -61,7 +60,7 @@ public class Checkers extends Application {
                 }
                 Field field = new Field(col, row, color);
                 fields.getChildren().add(field);
-                table[col][row]= field;
+
 
                 Piece piece = null;
                 if (row < 3 && ((col + row) % 2) != 0) {
@@ -74,6 +73,7 @@ public class Checkers extends Application {
                     field.setPiece(piece);
                     pieces.getChildren().add(piece);
                 }
+                table[col][row]= field;
             }
         }
         return root;
@@ -90,22 +90,33 @@ public class Checkers extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
     }
 
     private Piece makePiece(PieceType pieceType, int col, int row) {
         Piece piece = new Piece(pieceType, col, row);
 
 
-        piece.setOnMouseReleased(event ->{
+        piece.setOnMouseReleased(event -> {
+            int oldCol = piece.getCol();
+            int oldRow = piece.getRow();
             int newCol =(int) ((piece.getLayoutX()+(TILE_SIZE/2))/TILE_SIZE);
             int newRow = (int) ((piece.getLayoutY()+(TILE_SIZE/2))/TILE_SIZE);
+            System.out.println("newCOl " + newCol + ", newRow: " + newRow);
+            MoveType result = Controller.INSTANCE.checkMove(piece, newCol, newRow);
 
-            piece.relocate(newCol*TILE_SIZE, newRow*TILE_SIZE);
-            piece.setCol(newCol);
-            piece.setRow(newRow);
-            System.out.println(piece.getCol());
-            System.out.println(piece.getRow());
+            if (result == MoveType.FORBIDDEN) {
+                piece.relocate(oldCol*TILE_SIZE, oldRow*TILE_SIZE);
+            } else if (result == MoveType.NORMAL) {
+                piece.relocate(newCol * TILE_SIZE, newRow * TILE_SIZE);
+                piece.setCol(newCol);
+                piece.setRow(newRow);
+                table[oldCol][oldRow].setPiece(null);
+                table[newCol][newRow].setPiece(piece);
+                System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "+ table[oldCol][oldRow].toString());
+            }
         });
+
         return piece;
     }
 

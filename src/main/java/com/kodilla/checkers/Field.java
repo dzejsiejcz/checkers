@@ -18,7 +18,10 @@ public class Field extends Button {
         setMinSize(TILE_SIZE, TILE_SIZE);
         setStyle(color);
         relocate(col * TILE_SIZE, row * TILE_SIZE);
+
+        setOnMouseClicked(event -> System.out.println("col: " + col + "row: " + row));
     }
+
 
     public boolean hasPiece() {
         return piece != null;
@@ -38,5 +41,18 @@ public class Field extends Button {
 
     public String getColor() {
         return color;
+    }
+
+    public Piece getPiece() {
+        return piece;
+    }
+
+    @Override
+    public String toString() {
+        return "Field{" +
+                ", col=" + col +
+                "row=" + row +
+                ", piece=" + piece +
+                '}';
     }
 }
