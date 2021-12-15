@@ -23,6 +23,8 @@ public class Controller {
     }
 
     public MoveType checkMove(Piece piece, int newCol, int newRow) {
+        int oldCol = piece.getCol();
+        int oldRow = piece.getRow();
 
         if (newCol<0 || newRow<0 || newCol>=WIDTH || newRow>=HEIGHT){
             return FORBIDDEN;
@@ -31,23 +33,25 @@ public class Controller {
         if (newField.getColor().equals(COLOR_WHITE) || newField.hasPiece()){
             return FORBIDDEN;
         }
-        int deltaY = newRow - piece.getRow();
+        int deltaY = newRow - oldRow;
         if (piece.getType() == PieceType.WHITE && deltaY>0) {
             return FORBIDDEN;
         }
         if (piece.getType() == PieceType.RED && deltaY<0) {
             return FORBIDDEN;
         }
-        int deltaX = newCol - piece.getCol();
-        /**
-         *
-         *
-         */
+        int deltaX = newCol - oldCol;
+// dodać warunek isBeating
         if (abs(deltaX) == 1 && abs(deltaY) == 1 && !piece.isBeating()) {
             return NORMAL;
         }
-        if (abs(deltaX) == 2 && abs(deltaY) == 2 && piece.isBeating()) {
-            return NORMAL; //zmienić na KILLING
+
+        int neighborCol = (newCol + oldCol) / 2;
+        int neighborRow = (newRow + oldRow) / 2;
+        Piece neighbor = Checkers.table[neighborCol][neighborRow].getPiece();
+
+        if (neighbor != null && piece.getType() != neighbor.getType()) {
+            return KILLING;
         }
 
 

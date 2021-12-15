@@ -114,6 +114,18 @@ public class Checkers extends Application {
                 table[oldCol][oldRow].setPiece(null);
                 table[newCol][newRow].setPiece(piece);
                 System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "+ table[oldCol][oldRow].toString());
+            } else if (result == MoveType.KILLING) {
+                piece.relocate(newCol * TILE_SIZE, newRow * TILE_SIZE);
+                piece.setCol(newCol);
+                piece.setRow(newRow);
+                table[oldCol][oldRow].setPiece(null);
+                table[newCol][newRow].setPiece(piece);
+                int neighborCol = (newCol + oldCol) / 2;
+                int neighborRow = (newRow + oldRow) / 2;
+                System.out.println("neibCol " + neighborCol + " neibRow " + neighborRow);
+
+                pieces.getChildren().remove(table[neighborCol][neighborRow].getPiece());
+                table[neighborCol][neighborRow].setPiece(null);
             }
         });
 
