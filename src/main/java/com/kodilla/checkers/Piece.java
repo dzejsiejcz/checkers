@@ -3,6 +3,10 @@ package com.kodilla.checkers;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.kodilla.checkers.Checkers.*;
 
@@ -11,19 +15,22 @@ public class Piece extends StackPane {
 
     private int row;
     private int col;
-    private PieceType type;
+    int description;
+    private final PieceType type;
     private boolean isBeating = false;
+    private List<Integer[]> fieldsAfterBeats = new ArrayList<>();
 
     private double mouseX, mouseY;
 
 
 
 
-    public Piece( PieceType type, int col, int row) {
+    public Piece( PieceType type, int col, int row, int description) {
 
         this.type = type;
         this.row = row;
         this.col = col;
+        this.description = description;
 
         relocate(col * TILE_SIZE, row * TILE_SIZE);
 
@@ -33,15 +40,17 @@ public class Piece extends StackPane {
         circle.setStrokeWidth(3);
         circle.setTranslateX((TILE_SIZE - 15)/4);
         circle.setTranslateY((TILE_SIZE - 15)/4);
-        getChildren().addAll(circle);
+        Text text = new Text (String.valueOf(description));
+        text.setTranslateX((TILE_SIZE - 15)/4);
+        text.setTranslateY((TILE_SIZE - 15)/4);
+        getChildren().addAll(circle, text);
+
         setOnMousePressed(event -> {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
         });
-        setOnMouseDragged(event -> {
-            relocate((event.getSceneX()-mouseX)+this.col*TILE_SIZE,
-                    (event.getSceneY()-mouseY)+this.row*TILE_SIZE);
-        });
+        setOnMouseDragged(event -> relocate((event.getSceneX()-mouseX)+this.col*TILE_SIZE,
+                (event.getSceneY()-mouseY)+this.row*TILE_SIZE));
 
     }
 
@@ -57,8 +66,16 @@ public class Piece extends StackPane {
         return type;
     }
 
+    public int getDescription() {
+        return description;
+    }
+
     public boolean isBeating() {
         return isBeating;
+    }
+
+    public List<Integer[]> getFieldsAfterBeats() {
+        return fieldsAfterBeats;
     }
 
     public void setRow(int row) {
@@ -69,22 +86,12 @@ public class Piece extends StackPane {
         this.col = col;
     }
 
-    public void setBeating(Field[][] table) {
-        if (type == PieceType.WHITE) {
-            if (table[col-1][row-1].getPiece().getType()==PieceType.RED
-                    || table[col+1][row-1].getPiece().getType()==PieceType.RED){
-                isBeating = true;
-            } else {
-                isBeating = false;
-            }
-        } else if (type == PieceType.RED) {
-            if (table[col - 1][row + 1].getPiece().getType() == PieceType.WHITE
-                    || table[col + 1][row + 1].getPiece().getType() == PieceType.WHITE) {
-                isBeating = true;
-            } else {
-                isBeating = false;
-            }
-        }
+    public void setBeating(boolean beating) {
+        isBeating = beating;
+    }
+
+    public void setAvailableBeat(int col, int row) {
+        fieldsAfterBeats.add(new Integer[]{col, row});
     }
 
     @Override

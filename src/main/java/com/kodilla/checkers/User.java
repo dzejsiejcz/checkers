@@ -2,17 +2,29 @@ package com.kodilla.checkers;
 
 public class User {
 
-    private String name;
+    private final String name;
     private boolean isBeating;
     private int numbPieces = 12;
+    private boolean yourTurn;
+    private final PieceType pieceType;
 
-    public User(String name, boolean isBeating) {
+    public User(String name, PieceType pieceType, boolean isBeating, boolean yourTurn) {
         this.name = name;
         this.isBeating = isBeating;
+        this.pieceType = pieceType;
+        this.yourTurn = yourTurn;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean notYourTurn() {
+        return !yourTurn;
+    }
+
+    public PieceType getPieceType() {
+        return pieceType;
     }
 
     public boolean isBeating() {
@@ -27,7 +39,11 @@ public class User {
         isBeating = beating;
     }
 
-    public void setNumbPieces(int numbPieces) {
-        this.numbPieces = numbPieces;
+    public void setYourTurn(boolean yourTurn) {
+        this.yourTurn = yourTurn;
+    }
+
+    public void subtractOnePiece() {
+        numbPieces--;
     }
 }

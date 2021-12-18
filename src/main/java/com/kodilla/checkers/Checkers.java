@@ -2,14 +2,20 @@ package com.kodilla.checkers;
 
 import javafx.application.Application;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import static com.kodilla.checkers.Controller.switchTurn;
 import static com.kodilla.checkers.PieceType.RED;
 import static com.kodilla.checkers.PieceType.WHITE;
 
@@ -19,18 +25,27 @@ public class Checkers extends Application {
 
     public static final String COLOR_BLUE = "-fx-background-color : #0000FF;";
     public static final String COLOR_WHITE = "-fx-background-color : #FFFFF0;";
-    private Image board = new Image("file:src/main/resources/table.png");
+    private final Image board = new Image("file:src/main/resources/table.png");
     public static final double TILE_SIZE = 51.5;
-    public static final double PADDING_X = 360;
-    public static final double PADDING_Y = 140;
+    public static final int PADDING_X = 360;
+    public static final int PADDING_Y = 140;
     public static final int HEIGHT = 8;
     public static final int WIDTH = 8;
 
 
     private Group fields = new Group();
     private Group pieces = new Group();
+    private GridPane grid = new GridPane();
+
+    private Label turn = new Label("Twoj ruch:");
+    private Label user = new Label("Bialy");
 
     public static Field[][] table = new Field[WIDTH][HEIGHT];
+    private int counterOfPieces = 0;
+
+    public static User userRed = new User("Czerwony", RED, false, false);
+    public static User userWhite = new User("Bialy", WHITE, false, true);
+
 
 
     private Parent createTable() {
@@ -41,13 +56,11 @@ public class Checkers extends Application {
         Pane root = new Pane();
         root.setPrefSize(1118, 616);
         root.setBackground(background);
-        root.getChildren().addAll(fields, pieces);
+        root.getChildren().addAll(fields, pieces, grid);
 
         fields.setLayoutX(PADDING_X);
         fields.setLayoutY(PADDING_Y);
-
         String color;
-
         pieces.setLayoutX(PADDING_X);
         pieces.setLayoutY(PADDING_Y);
 
@@ -60,14 +73,14 @@ public class Checkers extends Application {
                 }
                 Field field = new Field(col, row, color);
                 fields.getChildren().add(field);
-
-
                 Piece piece = null;
                 if (row < 3 && ((col + row) % 2) != 0) {
-                    piece = makePiece(RED, col, row);
+                    piece = makePiece(RED, col, row, counterOfPieces);
+                    counterOfPieces++;
                 }
                 if (row > 4 && ((col + row) % 2) != 0) {
-                    piece = makePiece(WHITE, col, row);
+                    piece = makePiece(WHITE, col, row, counterOfPieces);
+                    counterOfPieces++;
                 }
                 if (piece !=null) {
                     field.setPiece(piece);
@@ -76,6 +89,20 @@ public class Checkers extends Application {
                 table[col][row]= field;
             }
         }
+
+        grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(100));
+        grid.setHgap(20);
+        grid.setVgap(30);
+        Font font1 = new Font("Arial", 40);
+        turn.setFont(font1);
+        user.setFont(font1);
+        turn.setTextFill(Color.WHITE);
+        user.setTextFill(Color.WHITE);
+        grid.add(turn, 0,0);
+        grid.add(user, 0, 1);
+
+
         return root;
     }
 
@@ -93,8 +120,8 @@ public class Checkers extends Application {
 
     }
 
-    private Piece makePiece(PieceType pieceType, int col, int row) {
-        Piece piece = new Piece(pieceType, col, row);
+    private Piece makePiece(PieceType pieceType, int col, int row, int counterOfPieces) {
+        Piece piece = new Piece(pieceType, col, row, counterOfPieces);
 
 
         piece.setOnMouseReleased(event -> {
@@ -108,11 +135,13 @@ public class Checkers extends Application {
             if (result == MoveType.FORBIDDEN) {
                 piece.relocate(oldCol*TILE_SIZE, oldRow*TILE_SIZE);
             } else if (result == MoveType.NORMAL) {
+
                 piece.relocate(newCol * TILE_SIZE, newRow * TILE_SIZE);
                 piece.setCol(newCol);
                 piece.setRow(newRow);
                 table[oldCol][oldRow].setPiece(null);
                 table[newCol][newRow].setPiece(piece);
+                user.setText(switchTurn(piece, false));
                 System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "+ table[oldCol][oldRow].toString());
             } else if (result == MoveType.KILLING) {
                 piece.relocate(newCol * TILE_SIZE, newRow * TILE_SIZE);
@@ -126,6 +155,7 @@ public class Checkers extends Application {
 
                 pieces.getChildren().remove(table[neighborCol][neighborRow].getPiece());
                 table[neighborCol][neighborRow].setPiece(null);
+                user.setText(switchTurn(piece, true));
             }
         });
 
