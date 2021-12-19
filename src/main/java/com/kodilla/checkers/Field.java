@@ -2,13 +2,13 @@ package com.kodilla.checkers;
 
 import javafx.scene.control.Button;
 
-import static com.kodilla.checkers.Checkers.*;
+import static com.kodilla.checkers.Constants.TILE_SIZE;
 
 public class Field extends Button {
     private int row;
     private int col;
     private String color;
-    private Piece piece;
+    private Pawn pawn;
 
 
     public Field(int col, int row, String color) {
@@ -23,12 +23,12 @@ public class Field extends Button {
     }
 
 
-    public boolean hasPiece() {
-        return piece != null;
+    public boolean hasPawn() {
+        return pawn != null;
     }
 
-    public void setPiece(Piece piece) {
-        this.piece = piece;
+    public void setPawn(Pawn pawn) {
+        this.pawn = pawn;
     }
 
     public int getRow() {
@@ -43,8 +43,8 @@ public class Field extends Button {
         return color;
     }
 
-    public Piece getPiece() {
-        return piece;
+    public Pawn getPawn() {
+        return pawn;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Field extends Button {
         return "Field{" +
                 ", col=" + col +
                 "row=" + row +
-                ", piece=" + piece +
+                ", pawn=" + pawn +
                 '}';
     }
 }

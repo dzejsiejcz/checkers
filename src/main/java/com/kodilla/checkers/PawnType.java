@@ -1,6 +1,6 @@
 package com.kodilla.checkers;
 
-public enum PieceType {
+public enum PawnType {
     WHITE, RED
     }
 

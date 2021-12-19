@@ -4,46 +4,42 @@ public class User {
 
     private final String name;
     private boolean isBeating;
-    private int numbPieces = 12;
-    private boolean yourTurn;
-    private final PieceType pieceType;
+    private int numbOfPawns = 12;
 
-    public User(String name, PieceType pieceType, boolean isBeating, boolean yourTurn) {
+    private final PawnType pawnType;
+
+    public User(String name, PawnType pawnType, boolean isBeating) {
         this.name = name;
         this.isBeating = isBeating;
-        this.pieceType = pieceType;
-        this.yourTurn = yourTurn;
+        this.pawnType = pawnType;
     }
 
     public String getName() {
         return name;
     }
 
-    public boolean notYourTurn() {
-        return !yourTurn;
-    }
-
-    public PieceType getPieceType() {
-        return pieceType;
+    public PawnType getPawnType() {
+        return pawnType;
     }
 
     public boolean isBeating() {
         return isBeating;
     }
 
-    public int getNumbPieces() {
-        return numbPieces;
+    public int getNumbPawn() {
+        return numbOfPawns;
+    }
+
+    public int getNumbOfPawns() {
+        return numbOfPawns;
     }
 
     public void setBeating(boolean beating) {
         isBeating = beating;
     }
 
-    public void setYourTurn(boolean yourTurn) {
-        this.yourTurn = yourTurn;
-    }
 
-    public void subtractOnePiece() {
-        numbPieces--;
+    public void subtractOnePawn() {
+        numbOfPawns--;
     }
 }

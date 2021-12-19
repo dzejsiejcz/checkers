@@ -8,43 +8,47 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kodilla.checkers.Checkers.*;
+import static com.kodilla.checkers.Constants.*;
 
+/**
+ * pawnNumber to describe pawn on the board
+ * type Red or White
+ * list fieldsAfterBeats -list of fields where the pawn can move after the possible beating
+ */
 
-public class Piece extends StackPane {
+public class Pawn extends StackPane {
 
     private int row;
     private int col;
-    int description;
-    private final PieceType type;
-    private boolean isBeating = false;
+    int pawnNumber;
+    private final PawnType type;
+    private boolean canKill = false;
     private List<Integer[]> fieldsAfterBeats = new ArrayList<>();
 
     private double mouseX, mouseY;
 
-
-
-
-    public Piece( PieceType type, int col, int row, int description) {
+    public Pawn(PawnType type, int col, int row, int pawnNumber) {
 
         this.type = type;
         this.row = row;
         this.col = col;
-        this.description = description;
+        this.pawnNumber = pawnNumber;
 
         relocate(col * TILE_SIZE, row * TILE_SIZE);
 
         Circle circle = new Circle(15);
-        circle.setFill(type == PieceType.RED ? Color.RED : Color.WHITE);
+        circle.setFill(type == PawnType.RED ? Color.RED : Color.WHITE);
         circle.setStroke(Color.BLACK);
         circle.setStrokeWidth(3);
         circle.setTranslateX((TILE_SIZE - 15)/4);
         circle.setTranslateY((TILE_SIZE - 15)/4);
-        Text text = new Text (String.valueOf(description));
+        Text text = new Text (String.valueOf(this.pawnNumber));
         text.setTranslateX((TILE_SIZE - 15)/4);
         text.setTranslateY((TILE_SIZE - 15)/4);
         getChildren().addAll(circle, text);
-
+/**
+ * moving the pawn on the board, last stage of this movement is implemented in Checkers.makePiece
+ */
         setOnMousePressed(event -> {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
@@ -62,16 +66,16 @@ public class Piece extends StackPane {
         return col;
     }
 
-    public PieceType getType() {
+    public PawnType getType() {
         return type;
     }
 
-    public int getDescription() {
-        return description;
+    public int getPawnNumber() {
+        return pawnNumber;
     }
 
-    public boolean isBeating() {
-        return isBeating;
+    public boolean canKill() {
+        return canKill;
     }
 
     public List<Integer[]> getFieldsAfterBeats() {
@@ -86,21 +90,21 @@ public class Piece extends StackPane {
         this.col = col;
     }
 
-    public void setBeating(boolean beating) {
-        isBeating = beating;
+    public void setCanKill(boolean canKill) {
+        this.canKill = canKill;
     }
 
-    public void setAvailableBeat(int col, int row) {
+    public void setPossiblePositionAfterBeating(int col, int row) {
         fieldsAfterBeats.add(new Integer[]{col, row});
     }
 
     @Override
     public String toString() {
-        return "Piece{" +
+        return "Pawn{" +
                 "row=" + row +
                 ", col=" + col +
                 ", type=" + type +
-                ", isBeating=" + isBeating +
+                ", canKill=" + canKill +
                 '}';
     }
 }
