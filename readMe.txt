@@ -11,3 +11,10 @@ podczas jednego ruchu tym samym pionkiem można zbić więcej niż jeden pion
 gra kończy się remisem, gdy żaden z graczy nie może zbić pionu przeciwnika
 Warto wiedzieć
 Czy trzeba bić? – tak! Jedną z ważniejszych zasad gry w warcaby jest obligatoryjność zbijania pionków przeciwnika. Żaden z graczy nie może zrezygnować z bicia.
+
+
+
+
+błąd: JavaFX runtime components are missing, and are required to run this application.
+
+tip: https://chat.kodilla.com/group/help-java-tools?msg=NTtnimLTgAtLC2nzx
