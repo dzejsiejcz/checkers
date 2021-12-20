@@ -1,15 +1,14 @@
-package com.kodilla.checkers;
+package com.kodilla.checkers.model;
 
 import javafx.scene.control.Button;
 
-import static com.kodilla.checkers.Constants.TILE_SIZE;
+import static com.kodilla.checkers.utils.Constants.TILE_SIZE;
 
 public class Field extends Button {
-    private int row;
-    private int col;
-    private String color;
+    private final int row;
+    private final int col;
+    private final String color;
     private Pawn pawn;
-
 
     public Field(int col, int row, String color) {
         this.row = row;
@@ -29,14 +28,6 @@ public class Field extends Button {
 
     public void setPawn(Pawn pawn) {
         this.pawn = pawn;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
     }
 
     public String getColor() {

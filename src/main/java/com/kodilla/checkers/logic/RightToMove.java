@@ -1,9 +1,11 @@
-package com.kodilla.checkers;
+package com.kodilla.checkers.logic;
 
 import static com.kodilla.checkers.Checkers.userRed;
 import static com.kodilla.checkers.Checkers.userWhite;
-import static com.kodilla.checkers.PawnType.*;
-import static com.kodilla.checkers.Texts.toMove;
+import static com.kodilla.checkers.utils.PawnType.*;
+import static com.kodilla.checkers.model.Texts.toMove;
+
+import com.kodilla.checkers.utils.PawnType;
 
 public class RightToMove {
 

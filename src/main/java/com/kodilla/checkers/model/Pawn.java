@@ -1,5 +1,6 @@
-package com.kodilla.checkers;
+package com.kodilla.checkers.model;
 
+import com.kodilla.checkers.utils.PawnType;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -8,22 +9,28 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kodilla.checkers.Constants.*;
+import static com.kodilla.checkers.utils.Constants.*;
 
 /**
  * pawnNumber to describe pawn on the board
  * type Red or White
  * list fieldsAfterBeats -list of fields where the pawn can move after the possible beating
  */
-
 public class Pawn extends StackPane {
 
     private int row;
     private int col;
+    /**
+     * Number of pawn to debug the. ..
+     */
     int pawnNumber;
     private final PawnType type;
     private boolean canKill = false;
-    private List<Integer[]> fieldsAfterBeats = new ArrayList<>();
+    /**
+     * List :
+     * Arr :
+     */
+    private List<Coordinates> fieldsAfterBeats = new ArrayList<>();
 
     private double mouseX, mouseY;
 
@@ -78,7 +85,7 @@ public class Pawn extends StackPane {
         return canKill;
     }
 
-    public List<Integer[]> getFieldsAfterBeats() {
+    public List<Coordinates> getFieldsAfterBeats() {
         return fieldsAfterBeats;
     }
 
@@ -95,7 +102,11 @@ public class Pawn extends StackPane {
     }
 
     public void setPossiblePositionAfterBeating(int col, int row) {
-        fieldsAfterBeats.add(new Integer[]{col, row});
+        fieldsAfterBeats.add(
+                Coordinates.Builder.aCoordinates()
+                .colNumber(col)
+                .rowNumber(row)
+                .build());
     }
 
     @Override

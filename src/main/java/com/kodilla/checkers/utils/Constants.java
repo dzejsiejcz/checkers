@@ -1,4 +1,4 @@
-package com.kodilla.checkers;
+package com.kodilla.checkers.utils;
 
 public class Constants {
 
