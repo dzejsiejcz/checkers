@@ -1,4 +1,6 @@
-package com.kodilla.checkers;
+package com.kodilla.checkers.model;
+
+import com.kodilla.checkers.utils.PawnType;
 
 public class User {
 
