@@ -9,4 +9,5 @@ public class Texts {
     public static final String numbPawns = "The number of \n remaining pawns";
     public static final String additional = "You have an additional move";
     public static final String toMove = " have to move";
+    public static final String end = "The end of a game";
 }

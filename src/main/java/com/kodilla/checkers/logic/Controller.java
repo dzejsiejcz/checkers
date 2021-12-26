@@ -1,10 +1,9 @@
 package com.kodilla.checkers.logic;
 
+import static com.kodilla.checkers.Checkers.*;
+
+import static com.kodilla.checkers.model.Texts.end;
 import static java.lang.Math.abs;
-import static com.kodilla.checkers.Checkers.rightToMove;
-import static com.kodilla.checkers.Checkers.table;
-import static com.kodilla.checkers.Checkers.userRed;
-import static com.kodilla.checkers.Checkers.userWhite;
 import static com.kodilla.checkers.model.Texts.additional;
 import static com.kodilla.checkers.utils.Constants.COLOR_WHITE;
 import static com.kodilla.checkers.utils.Constants.HEIGHT;
@@ -20,6 +19,9 @@ import com.kodilla.checkers.model.Field;
 import com.kodilla.checkers.model.Pawn;
 import com.kodilla.checkers.utils.MoveType;
 import com.kodilla.checkers.utils.PawnType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
 
@@ -57,12 +59,12 @@ public class Controller {
             return FORBIDDEN;
         }
 
-        /**check possibility of beating, if possible, user must beat
-         *
+        /**
+         *  check possibility of beating, if possible, user must beat
          */
         Coordinates checkingFieldAfterBeat = new Coordinates(newCol, newRow);
-        System.out.println("beating?: " + pawn.canKill());
-        if (pawn.canKill()) {
+        //System.out.println("beating?: " + pawn.canKill());
+        if (checkBeatingForGivenPawn(pawn)) {
             for (Coordinates currentField : pawn.getFieldsAfterBeats()) {
                 if (currentField.getColNumber() == checkingFieldAfterBeat.getColNumber() &&
                         currentField.getRowNumber() == checkingFieldAfterBeat.getRowNumber()) {
@@ -72,23 +74,23 @@ public class Controller {
             return FORBIDDEN;
         }
 
-        /**check right direction of move, except beating
-         *
+        /**
+         *  check right direction of move, except beating
          */
         int deltaY = newRow - oldRow;
-        if (pawn.getType() == WHITE && deltaY > 0 && !pawn.canKill()) {
+        if (pawn.getType() == WHITE && deltaY > 0 && !checkBeatingForGivenPawn(pawn)) {
             return FORBIDDEN;
         }
-        if (pawn.getType() == RED && deltaY < 0 && !pawn.canKill()) {
+        if (pawn.getType() == RED && deltaY < 0 && !checkBeatingForGivenPawn(pawn)) {
             return FORBIDDEN;
         }
 
         int deltaX = newCol - oldCol;
 
-        /** normal movement if no beating, beating is obligatory
-         *
+        /**
+         *   normal movement if no beating, beating is obligatory
          */
-        if (abs(deltaX) == 1 && abs(deltaY) == 1 && !pawn.canKill() && !checkBeatingOnEntireBoard(pawn.getType())) {
+        if (abs(deltaX) == 1 && abs(deltaY) == 1 && !checkBeatingOnEntireBoard(pawn.getType())) {
             System.out.println("first checking");
             return NORMAL;
         }
@@ -101,17 +103,15 @@ public class Controller {
      * info into each Pawn and return true if any Pawn can hit
      */
     public static boolean checkBeatingOnEntireBoard(PawnType color) {
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                Field checkingField = table[x][y];
-                if (checkingField.hasPawn()) {
-                    Pawn checkingPawn = checkingField.getPawn();
-                    PawnType pawnType = checkingPawn.getType();
-                    if (pawnType == color && checkBeatingForGivenPawn(checkingPawn)) {
-                        System.out.println("Pawn have sth to kill");
-                        return true;
-                    }
-                }
+        List<Pawn> pawns = getListOfOneTypeOfPawns(color);
+        for (Pawn checkingPawn : pawns) {
+            if (checkBeatingForGivenPawn(checkingPawn)) {
+                System.out.println("Pawn have sth to kill");
+                return true;
+                //wiedziałem, że coś nie tak było jak mi skracałeś Macieju tę metodę, nie chciałem returna gry true
+                //aby przeszedl wszystkie pionki i ustawił kazdemu pionkowi aktualny boolean canKill,
+                // pojawił sie problem bijących dwóch różnych pionków, co naprawiłem,
+                // teraz jest mniej liczenia, zrezygnowałem z właściwości canKill i wyszło na Twoje :)
             }
         }
         System.out.println("Pawn doesn't have anything to kill");
@@ -137,7 +137,7 @@ public class Controller {
          * -1     o   o
          * -2  a         a
          */
-        checkingPawn.setCanKill(false);
+        //heckingPawn.setCanKill(false);
         for (int i = -1; i < 2; i = i + 2) {
             for (int j = -1; j < 2; j = j + 2) {
                 int adjacentOpponentCol = x + i;
@@ -157,7 +157,7 @@ public class Controller {
                     if (neighbor.hasPawn() && !positionAfterBeating.hasPawn()) {
                         PawnType neighborType = neighbor.getPawn().getType();
                         if (neighborType != pawnType) {
-                            checkingPawn.setCanKill(true);
+                            //checkingPawn.setCanKill(true);
                             checkingPawn.setPossiblePositionAfterBeating(locationAfterBeatCol, locationAfterBeatRow);
                             System.out.println("to kill: " + neighbor.getPawn().getPawnNumber());
                             possible = true;
@@ -167,7 +167,7 @@ public class Controller {
             }
         }
         System.out.println(pawnType + " " + checkingPawn.getPawnNumber()
-                + " has to kill? " + checkingPawn.canKill());
+                + " has to kill? " + possible);
         return possible;
     }
 
@@ -175,12 +175,12 @@ public class Controller {
      * End of movement, changing turn and set new number of pawns
      *
      * @param pawn     used Pawn
-     * @param isKilled is that ...
-     * @return Text to display on ....
+     * @param isKilled is that Pawn killed?
+     * @return Text to display above the board
      */
     public static String doesMovementSummary(Pawn pawn, boolean isKilled) {
-        checkBeatingOnEntireBoard(RED);
-        checkBeatingOnEntireBoard(WHITE);
+        //checkBeatingOnEntireBoard(RED);
+        //checkBeatingOnEntireBoard(WHITE);
         PawnType type = pawn.getType();
 
         if (isKilled) {
@@ -194,7 +194,30 @@ public class Controller {
             }
         }
 
+        if (!game.checkEndGame()) {
+            return end;
+        }
+
         return rightToMove.switchTurn();
     }
+
+
+
+
+
+    public static List<Pawn> getListOfOneTypeOfPawns(PawnType color) {
+        List<Pawn> pawns = new ArrayList<>();
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Field checkingField = table[x][y];
+                if (checkingField.hasPawn() && checkingField.getPawn().getType()==color) {
+                    pawns.add(checkingField.getPawn());
+                }
+            }
+        }
+        return pawns;
+    }
+
+
 
 }

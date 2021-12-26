@@ -13,12 +13,15 @@ import static com.kodilla.checkers.utils.PawnType.WHITE;
 
 import com.kodilla.checkers.logic.Controller;
 import com.kodilla.checkers.logic.RightToMove;
+import com.kodilla.checkers.logic.StateOfGame;
 import com.kodilla.checkers.model.Field;
 import com.kodilla.checkers.model.Pawn;
 import com.kodilla.checkers.model.Texts;
 import com.kodilla.checkers.model.User;
 import com.kodilla.checkers.utils.MoveType;
 import com.kodilla.checkers.utils.PawnType;
+import com.sun.javafx.menu.MenuItemBase;
+import com.sun.javafx.stage.EmbeddedWindow;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -26,6 +29,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -47,12 +52,14 @@ public class Checkers extends Application {
     public static User userWhite = new User(Texts.whites, WHITE, false);
     public static RightToMove rightToMove = new RightToMove();
     public static Field[][] table = new Field[WIDTH][HEIGHT];
+    public static StateOfGame game = new StateOfGame();
 
     private static final String CHECKERS = "Checkers";
     private final Image board = new Image("file:src/main/resources/table.png");
     private final Group fields = new Group();
     private final Group pawns = new Group();
     private final GridPane grid = new GridPane();
+    private final GridPane buttonsGrid = new GridPane();
     private final Label inviting = new Label(Texts.nameOfTheGame);
     private final Label redName = new Label(Texts.reds);
     private final Label whiteName = new Label(Texts.whites);
@@ -62,10 +69,14 @@ public class Checkers extends Application {
     private final Label numbRedPawns = new Label(String.valueOf(userRed.getNumbOfPawns()));
     private final Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
     private int pawnNumber = 0;
+    private Pane root = new Pane();
+    private Button btnNewGame = new Button("New Game");
 
     private final Font arial40 = new Font("Arial", 40);
     private final Font arial30 = new Font("Arial", 30);
     private final Font arial20 = new Font("Arial", 20);
+
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -74,6 +85,26 @@ public class Checkers extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        btnNewGame.setOnAction(e -> {
+            primaryStage.close();
+            cleanup();
+            Scene scene2 = new Scene(createBoard());
+            primaryStage.setTitle(CHECKERS);
+            primaryStage.setScene(scene2);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+
+        });
+
+    }
+
+    void cleanup() {
+        grid.getChildren().removeAll();
+        fields.getChildren().removeAll();
+        pawns.getChildren().removeAll();
+        buttonsGrid.getChildren().removeAll();
+        root.getChildren().removeAll();
     }
 
     private Parent createBoard() {
@@ -83,10 +114,10 @@ public class Checkers extends Application {
                         BackgroundPosition.CENTER, backgroundSize);
         Background background = new Background(backgroundImage);
 
-        Pane root = new Pane();
+
         root.setPrefSize(1118, 616); //size same as background image
         root.setBackground(background);
-        root.getChildren().addAll(fields, pawns, grid);
+        root.getChildren().addAll(fields, pawns, grid, buttonsGrid);
         /*
          * padding according to background image
          */
@@ -112,11 +143,11 @@ public class Checkers extends Application {
                 /*
                  * pawns only on blue fields
                  */
-                if (row < 3 && ((col + row) % 2) != 0) {
+                if (row == 2 && ((col + row) % 2) != 0) {
                     pawn = makePawn(RED, col, row, pawnNumber);
                     pawnNumber++;
                 }
-                if (row > 4 && ((col + row) % 2) != 0) {
+                if (row ==5 && ((col + row) % 2) != 0) {
                     pawn = makePawn(WHITE, col, row, pawnNumber);
                     pawnNumber++;
                 }
@@ -184,6 +215,18 @@ public class Checkers extends Application {
 
         grid.setMouseTransparent(true);
 
+        /*
+         * the grid with buttons
+         */
+        //buttonsGrid.setGridLinesVisible(true);
+        buttonsGrid.setAlignment(Pos.CENTER);
+        buttonsGrid.setPadding(new Insets(500, 50, 80, 100));
+        buttonsGrid.setHgap(20);
+        buttonsGrid.setVgap(10);
+
+        buttonsGrid.add(btnNewGame, 0, 0);
+
+
         return root;
     }
 
@@ -193,7 +236,9 @@ public class Checkers extends Application {
         /*
          * the last stage of moving the pawn, previous stages are included in Pawn class
          */
+        //while (game.isGame()) {
         pawn.setOnMouseReleased(event -> {
+
             int oldCol = pawn.getCol();
             int oldRow = pawn.getRow();
             int newCol = (int) ((pawn.getLayoutX() + (TILE_SIZE / 2)) / TILE_SIZE);
@@ -207,13 +252,13 @@ public class Checkers extends Application {
 
             } else if (result == MoveType.NORMAL) {
 
-                extracted(pawn, newCol, newRow, table[oldCol][oldRow]);
+                relocateToNewField(pawn, newCol, newRow, table[oldCol][oldRow]);
                 whoMove.setText(doesMovementSummary(pawn, false));
                 System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "
                         + table[oldCol][oldRow].toString());
 
             } else if (result == MoveType.KILLING) {
-                extracted(pawn, newCol, newRow, table[oldCol][oldRow]);
+                relocateToNewField(pawn, newCol, newRow, table[oldCol][oldRow]);
                 int neighborCol = (newCol + oldCol) / 2;
                 int neighborRow = (newRow + oldRow) / 2;
                 System.out.println("neibCol " + neighborCol + " neibRow " + neighborRow);
@@ -224,12 +269,12 @@ public class Checkers extends Application {
                 numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
                 numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));
             }
-        });
 
+        });
         return pawn;
     }
 
-    private void extracted(Pawn pawn, int newCol, int newRow, Field field) {
+    private void relocateToNewField(Pawn pawn, int newCol, int newRow, Field field) {
         pawn.relocate(newCol * TILE_SIZE, newRow * TILE_SIZE);
         pawn.setCol(newCol);
         pawn.setRow(newRow);

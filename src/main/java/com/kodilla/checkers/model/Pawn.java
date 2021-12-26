@@ -21,9 +21,9 @@ public class Pawn extends StackPane {
     private int row;
     private int col;
     /**
-     * Number of pawn to debug the. ..
+     * Number of pawn to debug the board.
      */
-    int pawnNumber;
+    private int pawnNumber;
     private final PawnType type;
     private boolean canKill = false;
     /**
@@ -53,9 +53,10 @@ public class Pawn extends StackPane {
         text.setTranslateX((TILE_SIZE - 15)/4);
         text.setTranslateY((TILE_SIZE - 15)/4);
         getChildren().addAll(circle, text);
-/**
- * moving the pawn on the board, last stage of this movement is implemented in Checkers.makePiece
- */
+
+        /**
+         * moving the pawn on the board, last stage of this movement is implemented in Checkers.makePiece
+         */
         setOnMousePressed(event -> {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
