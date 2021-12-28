@@ -46,7 +46,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-public class Checkers extends Application {
+public class Checkers {
 
     public static User userRed = new User(Texts.reds, RED, false);
     public static User userWhite = new User(Texts.whites, WHITE, false);
@@ -54,7 +54,7 @@ public class Checkers extends Application {
     public static Field[][] table = new Field[WIDTH][HEIGHT];
     public static StateOfGame game = new StateOfGame();
 
-    private static final String CHECKERS = "Checkers";
+
     private final Image board = new Image("file:src/main/resources/table.png");
     private final Group fields = new Group();
     private final Group pawns = new Group();
@@ -70,44 +70,19 @@ public class Checkers extends Application {
     private final Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
     private int pawnNumber = 0;
     private Pane root = new Pane();
-    private Button btnNewGame = new Button("New Game");
+
 
     private final Font arial40 = new Font("Arial", 40);
     private final Font arial30 = new Font("Arial", 30);
     private final Font arial20 = new Font("Arial", 20);
 
-
-
-    @Override
-    public void start(Stage primaryStage) {
-        Scene scene = new Scene(createBoard());
-        primaryStage.setTitle(CHECKERS);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
-
-        btnNewGame.setOnAction(e -> {
-            primaryStage.close();
-            cleanup();
-            Scene scene2 = new Scene(createBoard());
-            primaryStage.setTitle(CHECKERS);
-            primaryStage.setScene(scene2);
-            primaryStage.setResizable(false);
-            primaryStage.show();
-
-        });
+    public Checkers() {
 
     }
 
-    void cleanup() {
-        grid.getChildren().removeAll();
-        fields.getChildren().removeAll();
-        pawns.getChildren().removeAll();
-        buttonsGrid.getChildren().removeAll();
-        root.getChildren().removeAll();
-    }
 
-    private Parent createBoard() {
+
+    public Parent createBoard() {
         BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
         BackgroundImage backgroundImage =
                 new BackgroundImage(board, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -224,7 +199,7 @@ public class Checkers extends Application {
         buttonsGrid.setHgap(20);
         buttonsGrid.setVgap(10);
 
-        buttonsGrid.add(btnNewGame, 0, 0);
+        //buttonsGrid.add(btnNewGame, 0, 0);
 
 
         return root;
@@ -282,8 +257,6 @@ public class Checkers extends Application {
         table[newCol][newRow].setPawn(pawn);
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 
 }
