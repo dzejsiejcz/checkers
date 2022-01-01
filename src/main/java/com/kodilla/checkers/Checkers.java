@@ -1,13 +1,8 @@
 package com.kodilla.checkers;
 
-import static com.kodilla.checkers.logic.Controller.doesMovementSummary;
-import static com.kodilla.checkers.utils.Constants.COLOR_BLUE;
-import static com.kodilla.checkers.utils.Constants.COLOR_WHITE;
-import static com.kodilla.checkers.utils.Constants.HEIGHT;
-import static com.kodilla.checkers.utils.Constants.PADDING_X;
-import static com.kodilla.checkers.utils.Constants.PADDING_Y;
-import static com.kodilla.checkers.utils.Constants.TILE_SIZE;
-import static com.kodilla.checkers.utils.Constants.WIDTH;
+import static com.kodilla.checkers.logic.Controller.*;
+import static com.kodilla.checkers.model.Texts.toMove;
+import static com.kodilla.checkers.utils.Constants.*;
 import static com.kodilla.checkers.utils.PawnType.RED;
 import static com.kodilla.checkers.utils.PawnType.WHITE;
 
@@ -20,17 +15,12 @@ import com.kodilla.checkers.model.Texts;
 import com.kodilla.checkers.model.User;
 import com.kodilla.checkers.utils.MoveType;
 import com.kodilla.checkers.utils.PawnType;
-import com.sun.javafx.menu.MenuItemBase;
-import com.sun.javafx.stage.EmbeddedWindow;
-import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -44,9 +34,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 
-public class Checkers {
+import java.io.*;
+import java.util.Arrays;
+
+public class Checkers implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public static User userRed = new User(Texts.reds, RED, false);
     public static User userWhite = new User(Texts.whites, WHITE, false);
@@ -54,6 +49,16 @@ public class Checkers {
     public static Field[][] table = new Field[WIDTH][HEIGHT];
     public static StateOfGame game = new StateOfGame();
 
+    public static Button btnNewGame = new Button("New game");
+    public static Button btnSaveGame = new Button("Save game");
+    public static Button btnContinueGame = new Button("Continue saved game");
+    public static Button btnCloseGame = new Button("Save and Exit");
+
+    public static Label whoMove = new Label(rightToMove.getUserToMove() + " have to move");
+    public static Label numbRedPawnsDescribing = new Label(Texts.numbPawns);
+    public static Label numbWhitePawnsDescribing = new Label(Texts.numbPawns);
+    public static Label numbRedPawns = new Label(String.valueOf(userRed.getNumbOfPawns()));
+    public static Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
 
     private final Image board = new Image("file:src/main/resources/table.png");
     private final Group fields = new Group();
@@ -63,26 +68,22 @@ public class Checkers {
     private final Label inviting = new Label(Texts.nameOfTheGame);
     private final Label redName = new Label(Texts.reds);
     private final Label whiteName = new Label(Texts.whites);
-    private final Label whoMove = new Label(rightToMove.getUserToMove() + " have to move");
-    private final Label numbRedPawnsDescribing = new Label(Texts.numbPawns);
-    private final Label numbWhitePawnsDescribing = new Label(Texts.numbPawns);
-    private final Label numbRedPawns = new Label(String.valueOf(userRed.getNumbOfPawns()));
-    private final Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
-    private int pawnNumber = 0;
-    private Pane root = new Pane();
 
+
+    private int pawnNumber = 0;
+    private final Pane root = new Pane();
 
     private final Font arial40 = new Font("Arial", 40);
     private final Font arial30 = new Font("Arial", 30);
     private final Font arial20 = new Font("Arial", 20);
 
+
     public Checkers() {
 
     }
 
+    public Parent createBoard(boolean fromFile) {
 
-
-    public Parent createBoard() {
         BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
         BackgroundImage backgroundImage =
                 new BackgroundImage(board, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
@@ -104,35 +105,85 @@ public class Checkers {
         /*
          * creating board with pawns in the beginning
          */
-        for (int col = 0; col < 8; col++) {
-            for (int row = 0; row < 8; row++) {
-                String color;
-                if ((col + row) % 2 != 0) {
-                    color = COLOR_BLUE;
-                } else {
-                    color = COLOR_WHITE;
+        System.out.println(Arrays.stream(table).toList().size());
+        if (!fromFile) {
+            for (int col = 0; col < 8; col++) {
+                for (int row = 0; row < 8; row++) {
+                    String color;
+                    if ((col + row) % 2 != 0) {
+                        color = COLOR_BLUE;
+                    } else {
+                        color = COLOR_WHITE;
+                    }
+                    Field field = new Field(col, row, color);
+                    fields.getChildren().add(field);
+                    Pawn pawn = null;
+                    /*
+                     * pawns only on blue fields
+                     */
+                    if (row == 2 && ((col + row) % 2) != 0) {
+                        pawn = makePawn(RED, col, row, pawnNumber);
+                        pawnNumber++;
+                    }
+                    if (row == 5 && ((col + row) % 2) != 0) {
+                        pawn = makePawn(WHITE, col, row, pawnNumber);
+                        pawnNumber++;
+                    }
+                    if (pawn != null) {
+                        field.setPawn(pawn);
+                        pawns.getChildren().add(pawn);
+                    }
+                    table[col][row] = field;
                 }
-                Field field = new Field(col, row, color);
-                fields.getChildren().add(field);
-                Pawn pawn = null;
-                /*
-                 * pawns only on blue fields
-                 */
-                if (row == 2 && ((col + row) % 2) != 0) {
-                    pawn = makePawn(RED, col, row, pawnNumber);
-                    pawnNumber++;
-                }
-                if (row ==5 && ((col + row) % 2) != 0) {
-                    pawn = makePawn(WHITE, col, row, pawnNumber);
-                    pawnNumber++;
-                }
-                if (pawn != null) {
-                    field.setPawn(pawn);
-                    pawns.getChildren().add(pawn);
-                }
-                table[col][row] = field;
             }
+
+        } else {
+            try {
+                FileInputStream fis = new FileInputStream(SAVE_FILE);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                userRed = (User)ois.readObject();
+                System.out.println(userRed.toString());
+                userWhite = (User)ois.readObject();
+                System.out.println(userWhite.toString());
+                game = (StateOfGame)ois.readObject();
+                System.out.println(game.toString());
+                rightToMove = (RightToMove)ois.readObject();
+                System.out.println(rightToMove.toString());
+                for (int col = 0; col < 8; col++) {
+                    for (int row = 0; row < 8; row++) {
+                       String color = table[col][row].getColor();
+                       Field field = new Field(col, row, color);
+                        Field tempField = (Field)ois.readObject();
+
+                        Pawn tempPawn = tempField.getPawn();
+                        if (tempPawn != null) {
+                            PawnType type = tempPawn.getType();
+                            int number = tempPawn.getPawnNumber();
+                            Pawn pawn = makePawn(type, col, row, number);
+                            field.setPawn(pawn);
+                            pawns.getChildren().add(pawn);
+                        }
+                        field.setPawn(tempPawn);
+                        fields.getChildren().add(field);
+                    }
+                }
+            ois.close();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            System.out.println(game);
+            String endResponse = game.whoWon();
+            System.out.println(endResponse);
+            if (endResponse !=null) {
+                whoMove.setText(endResponse);
+            }
+
+            whoMove.setText(rightToMove.getUserToMove() + toMove);
+            numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
+            numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));
+
         }
+
         /*
          * the grid with any messages and notifications
          */
@@ -199,7 +250,10 @@ public class Checkers {
         buttonsGrid.setHgap(20);
         buttonsGrid.setVgap(10);
 
-        //buttonsGrid.add(btnNewGame, 0, 0);
+        buttonsGrid.add(btnContinueGame, 1,0);
+        buttonsGrid.add(btnNewGame, 0, 0);
+        buttonsGrid.add(btnSaveGame, 0,1);
+        buttonsGrid.add(btnCloseGame, 1,1);
 
 
         return root;
@@ -211,7 +265,7 @@ public class Checkers {
         /*
          * the last stage of moving the pawn, previous stages are included in Pawn class
          */
-        //while (game.isGame()) {
+
         pawn.setOnMouseReleased(event -> {
 
             int oldCol = pawn.getCol();
@@ -220,7 +274,7 @@ public class Checkers {
             int newRow = (int) ((pawn.getLayoutY() + (TILE_SIZE / 2)) / TILE_SIZE);
             System.out.println("newCOl " + newCol + ", newRow: " + newRow);
             MoveType result = Controller.INSTANCE.checkMove(pawn, newCol, newRow);
-
+            System.out.println("move type: " + result);
             if (result == MoveType.FORBIDDEN) {
                 pawn.relocate(oldCol * TILE_SIZE, oldRow * TILE_SIZE);
                 System.out.println("Forbitten move...");
@@ -233,13 +287,22 @@ public class Checkers {
                         + table[oldCol][oldRow].toString());
 
             } else if (result == MoveType.KILLING) {
+
                 relocateToNewField(pawn, newCol, newRow, table[oldCol][oldRow]);
+                //checkBeatingForGivenPawn(pawn);
                 int neighborCol = (newCol + oldCol) / 2;
                 int neighborRow = (newRow + oldRow) / 2;
                 System.out.println("neibCol " + neighborCol + " neibRow " + neighborRow);
-
-                pawns.getChildren().remove(table[neighborCol][neighborRow].getPawn());
+                System.out.println(table[neighborCol][neighborRow].toString());
+                Pawn tempPawn = table[neighborCol][neighborRow].getPawn();
+                int numb = tempPawn.getPawnNumber();
+                    System.out.println("tempPawn: " + tempPawn);
+                pawns.getChildren().forEach(System.out::println);
+                boolean resultOfRemoving = pawns.getChildren().remove(getPawnByNumber(numb));
+                    System.out.println("przerwa " + resultOfRemoving);
+                    pawns.getChildren().forEach(System.out::println);
                 table[neighborCol][neighborRow].setPawn(null);
+                    System.out.println(table[neighborCol][neighborRow].toString());
                 whoMove.setText(doesMovementSummary(pawn, true));
                 numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
                 numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));

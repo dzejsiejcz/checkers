@@ -7,7 +7,13 @@ import static com.kodilla.checkers.model.Texts.toMove;
 
 import com.kodilla.checkers.utils.PawnType;
 
-public class RightToMove {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class RightToMove implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 2L;
 
     private PawnType type = WHITE;
 
@@ -17,6 +23,7 @@ public class RightToMove {
     public PawnType getType() {
         return type;
     }
+
 
     public String getUserToMove () {
         if (type == WHITE) {
@@ -34,5 +41,16 @@ public class RightToMove {
         type = WHITE;
         System.out.println("White now");
         return userWhite.getName() + toMove;
+    }
+
+    public void cleanRightToMove() {
+        this.type = WHITE;
+    }
+
+    @Override
+    public String toString() {
+        return "RightToMove{" +
+                "type=" + type +
+                '}';
     }
 }

@@ -1,14 +1,21 @@
 package com.kodilla.checkers.model;
 
+import com.kodilla.checkers.logic.Controller;
+import com.kodilla.checkers.utils.MoveType;
 import com.kodilla.checkers.utils.PawnType;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import static com.kodilla.checkers.Checkers.*;
+import static com.kodilla.checkers.logic.Controller.doesMovementSummary;
 import static com.kodilla.checkers.utils.Constants.*;
 
 /**
@@ -16,16 +23,18 @@ import static com.kodilla.checkers.utils.Constants.*;
  * type Red or White
  * list fieldsAfterBeats -list of fields where the pawn can move after the possible beating
  */
-public class Pawn extends StackPane {
+public class Pawn extends StackPane implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 3L;
 
     private int row;
     private int col;
     /**
      * Number of pawn to debug the board.
      */
-    private int pawnNumber;
+    private final int pawnNumber;
     private final PawnType type;
-    private boolean canKill = false;
     /**
      * List :
      * Arr :
@@ -54,7 +63,7 @@ public class Pawn extends StackPane {
         text.setTranslateY((TILE_SIZE - 15)/4);
         getChildren().addAll(circle, text);
 
-        /**
+        /*
          * moving the pawn on the board, last stage of this movement is implemented in Checkers.makePiece
          */
         setOnMousePressed(event -> {
@@ -65,6 +74,7 @@ public class Pawn extends StackPane {
                 (event.getSceneY()-mouseY)+this.row*TILE_SIZE));
 
     }
+
 
     public int getRow() {
         return row;
@@ -82,9 +92,6 @@ public class Pawn extends StackPane {
         return pawnNumber;
     }
 
-    public boolean canKill() {
-        return canKill;
-    }
 
     public List<Coordinates> getFieldsAfterBeats() {
         return fieldsAfterBeats;
@@ -98,9 +105,6 @@ public class Pawn extends StackPane {
         this.col = col;
     }
 
-    public void setCanKill(boolean canKill) {
-        this.canKill = canKill;
-    }
 
     public void setPossiblePositionAfterBeating(int col, int row) {
         fieldsAfterBeats.add(
@@ -110,13 +114,19 @@ public class Pawn extends StackPane {
                 .build());
     }
 
+    public void clearFieldsAfterBeats(){
+        fieldsAfterBeats = new ArrayList<>();
+    }
+
+
     @Override
     public String toString() {
         return "Pawn{" +
                 "row=" + row +
                 ", col=" + col +
                 ", type=" + type +
-                ", canKill=" + canKill +
-                '}';
+                ", numb=" + pawnNumber +
+                ", coordinates="  + fieldsAfterBeats.toString() +
+                "}";
     }
 }

@@ -1,46 +1,84 @@
 package com.kodilla.checkers;
 
+
+import com.kodilla.checkers.model.Field;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import java.io.*;
+
+
+import static com.kodilla.checkers.Checkers.*;
+import static com.kodilla.checkers.logic.Controller.*;
+
 import static com.kodilla.checkers.model.Texts.nameOfTheGame;
+import static com.kodilla.checkers.utils.Constants.*;
+
 
 public class Game extends Application {
-    private Button btnNewGame = new Button("New Game");
+
+    private Checkers checkers = new Checkers();
+    private Scene scene = new Scene(checkers.createBoard(false));
+
+    private final File savedGame = new File(SAVE_FILE);
 
     @Override
     public void start(Stage primaryStage) {
-        Checkers checkers = new Checkers();
-        Scene scene = new Scene(checkers.createBoard());
-
         primaryStage.setTitle(nameOfTheGame);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        //primaryStage.add(btnNewGame);
         primaryStage.show();
 
-//        btnNewGame.setOnAction(e -> {
-//            primaryStage.close();
-//            cleanup();
-//            Scene scene2 = new Scene(createBoard());
-//            primaryStage.setTitle(CHECKERS);
-//            primaryStage.setScene(scene2);
-//            primaryStage.setResizable(false);
-//            primaryStage.show();
-//
-//        });
+        btnNewGame.setOnAction(event -> {
+            refreshStateOfGame();
+            checkers = new Checkers();
+            scene = new Scene(checkers.createBoard(false));
+            start(primaryStage);
+        });
+
+        btnSaveGame.setOnAction(event -> saveGame());
+
+        btnContinueGame.setOnAction(event -> {
+            checkers = new Checkers();
+            scene = new Scene(checkers.createBoard(true));
+
+            start(primaryStage);
+        });
+
+        btnCloseGame.setOnAction(event -> {
+            saveGame();
+            primaryStage.close();
+        });
 
     }
 
-    void cleanup() {
-//        grid.getChildren().removeAll();
-//        fields.getChildren().removeAll();
-//        pawns.getChildren().removeAll();
-//        buttonsGrid.getChildren().removeAll();
-//        root.getChildren().removeAll();
+    void refreshStateOfGame() {
+        userRed.cleanUp();
+        userWhite.cleanUp();
+        game.cleanStateOfGame();
+        rightToMove.cleanRightToMove();
     }
+
+    void saveGame() {
+        try {
+            FileOutputStream fos = new FileOutputStream(savedGame);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(userRed);
+            oos.writeObject(userWhite);
+            oos.writeObject(game);
+            oos.writeObject(rightToMove);
+
+            for (Field field : getListOfFields()) {
+                oos.writeObject(field);
+            }
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);

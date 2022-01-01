@@ -10,4 +10,7 @@ public class Texts {
     public static final String additional = "You have an additional move";
     public static final String toMove = " have to move";
     public static final String end = "The end of a game";
+    public static final String draw = "We have a tie";
+    public static final String won = " won!";
+
 }

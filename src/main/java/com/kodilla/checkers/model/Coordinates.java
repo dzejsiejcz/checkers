@@ -1,6 +1,12 @@
 package com.kodilla.checkers.model;
 
-public class Coordinates {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Coordinates implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 7L;
 
     private final int colNumber;
     private final int rowNumber;

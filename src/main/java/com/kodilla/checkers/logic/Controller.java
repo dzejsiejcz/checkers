@@ -2,9 +2,8 @@ package com.kodilla.checkers.logic;
 
 import static com.kodilla.checkers.Checkers.*;
 
-import static com.kodilla.checkers.model.Texts.end;
+import static com.kodilla.checkers.model.Texts.*;
 import static java.lang.Math.abs;
-import static com.kodilla.checkers.model.Texts.additional;
 import static com.kodilla.checkers.utils.Constants.COLOR_WHITE;
 import static com.kodilla.checkers.utils.Constants.HEIGHT;
 import static com.kodilla.checkers.utils.Constants.WIDTH;
@@ -90,7 +89,7 @@ public class Controller {
         /**
          *   normal movement if no beating, beating is obligatory
          */
-        if (abs(deltaX) == 1 && abs(deltaY) == 1 && !checkBeatingOnEntireBoard(pawn.getType())) {
+        if (abs(deltaX) == 1 && abs(deltaY) == 1 && !checkBeatingOnEntireBoard(pawn.getType()) && game.isGame()) {
             System.out.println("first checking");
             return NORMAL;
         }
@@ -104,27 +103,30 @@ public class Controller {
      */
     public static boolean checkBeatingOnEntireBoard(PawnType color) {
         List<Pawn> pawns = getListOfOneTypeOfPawns(color);
+        boolean response = false;
         for (Pawn checkingPawn : pawns) {
             if (checkBeatingForGivenPawn(checkingPawn)) {
-                System.out.println("Pawn have sth to kill");
-                return true;
+                //System.out.println("Pawn have sth to kill");
+                response = true;
                 //wiedziałem, że coś nie tak było jak mi skracałeś Macieju tę metodę, nie chciałem returna gry true
                 //aby przeszedl wszystkie pionki i ustawił kazdemu pionkowi aktualny boolean canKill,
                 // pojawił sie problem bijących dwóch różnych pionków, co naprawiłem,
                 // teraz jest mniej liczenia, zrezygnowałem z właściwości canKill i wyszło na Twoje :)
             }
         }
-        System.out.println("Pawn doesn't have anything to kill");
-        return false;
+        //System.out.println("Pawn doesn't have anything to kill");
+        return response;
     }
 
-    private static boolean checkBeatingForGivenPawn(Pawn checkingPawn) {
+    public static boolean checkBeatingForGivenPawn(Pawn checkingPawn) {
         boolean possible = false;
         Field neighbor;
         Field positionAfterBeating;
+        checkingPawn.clearFieldsAfterBeats();
         PawnType pawnType = checkingPawn.getType();
         int x = checkingPawn.getCol();
         int y = checkingPawn.getRow();
+
         /**
          * checking if in neighborhood of given pawn is a possibility to hit
          * local array 5x5: (a -the field after beating, o-an opponent, p-the given pawn)
@@ -137,7 +139,7 @@ public class Controller {
          * -1     o   o
          * -2  a         a
          */
-        //heckingPawn.setCanKill(false);
+
         for (int i = -1; i < 2; i = i + 2) {
             for (int j = -1; j < 2; j = j + 2) {
                 int adjacentOpponentCol = x + i;
@@ -157,17 +159,17 @@ public class Controller {
                     if (neighbor.hasPawn() && !positionAfterBeating.hasPawn()) {
                         PawnType neighborType = neighbor.getPawn().getType();
                         if (neighborType != pawnType) {
-                            //checkingPawn.setCanKill(true);
                             checkingPawn.setPossiblePositionAfterBeating(locationAfterBeatCol, locationAfterBeatRow);
-                            System.out.println("to kill: " + neighbor.getPawn().getPawnNumber());
+                            //System.out.println("to kill: " + neighbor.getPawn().getPawnNumber());
                             possible = true;
                         }
                     }
                 }
             }
         }
-        System.out.println(pawnType + " " + checkingPawn.getPawnNumber()
-                + " has to kill? " + possible);
+        //System.out.println(pawnType + " " + checkingPawn.getPawnNumber()
+        //        + " has to kill? " + possible);
+        //System.out.println("sprawdzany field, x: " + x + " ,y: " + y + table[x][y].toString());
         return possible;
     }
 
@@ -184,7 +186,7 @@ public class Controller {
         PawnType type = pawn.getType();
 
         if (isKilled) {
-            if (type == RED) {
+            if (type == WHITE) {
                 userRed.subtractOnePawn();
             } else {
                 userWhite.subtractOnePawn();
@@ -194,14 +196,25 @@ public class Controller {
             }
         }
 
-        if (!game.checkEndGame()) {
-            return end;
+        String endResponse = game.whoWon();
+
+        if (endResponse !=null) {
+            return endResponse;
         }
 
         return rightToMove.switchTurn();
     }
 
-
+    public static List<Field> getListOfFields() {
+        List<Field> fields = new ArrayList<>();
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Field checkingField = table[x][y];
+                fields.add(checkingField);
+            }
+        }
+        return fields;
+    }
 
 
 
@@ -216,6 +229,44 @@ public class Controller {
             }
         }
         return pawns;
+    }
+
+    public static List<Pawn> getListOfPawns() {
+        List<Pawn> allPawns = new ArrayList<>();
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Field checkingField = table[x][y];
+                if (checkingField.hasPawn()) {
+                    allPawns.add(checkingField.getPawn());
+                }
+            }
+        }
+        return allPawns;
+    }
+
+    public static Pawn getPawnByNumber(int number) {
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Field checkingField = table[x][y];
+                if (checkingField.hasPawn() && checkingField.getPawn().getPawnNumber()==number) {
+                    return checkingField.getPawn();
+                }
+            }
+        }
+        return null;
+    }
+
+    public static List<Integer> getListOfRowsOfOneTypeOfPawns(PawnType color) {
+        List<Integer> rowsOfPawns = new ArrayList<>();
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                Field checkingField = table[x][y];
+                if (checkingField.hasPawn() && checkingField.getPawn().getType()==color) {
+                    rowsOfPawns.add(checkingField.getPawn().getRow());
+                }
+            }
+        }
+        return rowsOfPawns;
     }
 
 
