@@ -17,7 +17,7 @@ public class RightToMove implements Serializable {
 
     private PawnType type = WHITE;
 
-    public  RightToMove() {
+    public RightToMove() {
     }
 
     public PawnType getType() {
@@ -25,7 +25,7 @@ public class RightToMove implements Serializable {
     }
 
 
-    public String getUserToMove () {
+    public String getUserToMove() {
         if (type == WHITE) {
             return userWhite.getName();
         }
