@@ -16,7 +16,9 @@ import static com.kodilla.checkers.logic.Controller.*;
 import static com.kodilla.checkers.model.Texts.nameOfTheGame;
 import static com.kodilla.checkers.utils.Constants.*;
 
-
+/*
+this class controls launching a game
+ */
 public class Game extends Application {
 
     private Checkers checkers = new Checkers();
@@ -35,6 +37,7 @@ public class Game extends Application {
             refreshStateOfGame();
             checkers = new Checkers();
             scene = new Scene(checkers.createBoard(false));
+
             start(primaryStage);
         });
 
@@ -47,13 +50,18 @@ public class Game extends Application {
             start(primaryStage);
         });
 
-        btnCloseGame.setOnAction(event -> {
+        btnSaveCloseGame.setOnAction(event -> {
             saveGame();
             primaryStage.close();
         });
 
+        btnCloseGame.setOnAction(event -> primaryStage.close());
+
     }
 
+    /*
+     * cleaning data in objects
+     */
     void refreshStateOfGame() {
         userRed.cleanUp();
         userWhite.cleanUp();
@@ -61,6 +69,9 @@ public class Game extends Application {
         rightToMove.cleanRightToMove();
     }
 
+    /*
+    trying to write state of game in a file
+     */
     void saveGame() {
         try {
             FileOutputStream fos = new FileOutputStream(savedGame);
@@ -70,9 +81,12 @@ public class Game extends Application {
             oos.writeObject(game);
             oos.writeObject(rightToMove);
 
+
             for (Field field : getListOfFields()) {
+
                 oos.writeObject(field);
             }
+
             oos.close();
         } catch (IOException e) {
             e.printStackTrace();

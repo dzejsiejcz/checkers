@@ -1,7 +1,5 @@
 package com.kodilla.checkers.model;
 
-import com.kodilla.checkers.logic.Controller;
-import com.kodilla.checkers.utils.MoveType;
 import com.kodilla.checkers.utils.PawnType;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -12,10 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import static com.kodilla.checkers.Checkers.*;
-import static com.kodilla.checkers.logic.Controller.doesMovementSummary;
 import static com.kodilla.checkers.utils.Constants.*;
 
 /**
@@ -56,11 +51,11 @@ public class Pawn extends StackPane implements Serializable {
         circle.setFill(type == PawnType.RED ? Color.RED : Color.WHITE);
         circle.setStroke(Color.BLACK);
         circle.setStrokeWidth(3);
-        circle.setTranslateX((TILE_SIZE - 15)/4);
-        circle.setTranslateY((TILE_SIZE - 15)/4);
-        Text text = new Text (String.valueOf(this.pawnNumber));
-        text.setTranslateX((TILE_SIZE - 15)/4);
-        text.setTranslateY((TILE_SIZE - 15)/4);
+        circle.setTranslateX((TILE_SIZE - 15) / 4);
+        circle.setTranslateY((TILE_SIZE - 15) / 4);
+        Text text = new Text(String.valueOf(this.pawnNumber));
+        text.setTranslateX((TILE_SIZE - 15) / 4);
+        text.setTranslateY((TILE_SIZE - 15) / 4);
         getChildren().addAll(circle, text);
 
         /*
@@ -70,8 +65,8 @@ public class Pawn extends StackPane implements Serializable {
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
         });
-        setOnMouseDragged(event -> relocate((event.getSceneX()-mouseX)+this.col*TILE_SIZE,
-                (event.getSceneY()-mouseY)+this.row*TILE_SIZE));
+        setOnMouseDragged(event -> relocate((event.getSceneX() - mouseX) + this.col * TILE_SIZE,
+                (event.getSceneY() - mouseY) + this.row * TILE_SIZE));
 
     }
 
@@ -109,12 +104,12 @@ public class Pawn extends StackPane implements Serializable {
     public void setPossiblePositionAfterBeating(int col, int row) {
         fieldsAfterBeats.add(
                 Coordinates.Builder.aCoordinates()
-                .colNumber(col)
-                .rowNumber(row)
-                .build());
+                        .colNumber(col)
+                        .rowNumber(row)
+                        .build());
     }
 
-    public void clearFieldsAfterBeats(){
+    public void clearFieldsAfterBeats() {
         fieldsAfterBeats = new ArrayList<>();
     }
 
@@ -122,11 +117,11 @@ public class Pawn extends StackPane implements Serializable {
     @Override
     public String toString() {
         return "Pawn{" +
-                "row=" + row +
                 ", col=" + col +
+                "row=" + row +
                 ", type=" + type +
                 ", numb=" + pawnNumber +
-                ", coordinates="  + fieldsAfterBeats.toString() +
+                ", coordinates=" + fieldsAfterBeats.toString() +
                 "}";
     }
 }

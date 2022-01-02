@@ -58,7 +58,7 @@ public class Controller {
             return FORBIDDEN;
         }
 
-        /**
+        /*
          *  check possibility of beating, if possible, user must beat
          */
         Coordinates checkingFieldAfterBeat = new Coordinates(newCol, newRow);
@@ -73,7 +73,7 @@ public class Controller {
             return FORBIDDEN;
         }
 
-        /**
+        /*
          *  check right direction of move, except beating
          */
         int deltaY = newRow - oldRow;
@@ -86,7 +86,7 @@ public class Controller {
 
         int deltaX = newCol - oldCol;
 
-        /**
+        /*
          *   normal movement if no beating, beating is obligatory
          */
         if (abs(deltaX) == 1 && abs(deltaY) == 1 && !checkBeatingOnEntireBoard(pawn.getType()) && game.isGame()) {
@@ -97,7 +97,7 @@ public class Controller {
         return FORBIDDEN;
     }
 
-    /**
+    /*
      * check if given Type of Pawns has the possibility of hitting and set this
      * info into each Pawn and return true if any Pawn can hit
      */
@@ -127,7 +127,7 @@ public class Controller {
         int x = checkingPawn.getCol();
         int y = checkingPawn.getRow();
 
-        /**
+        /*
          * checking if in neighborhood of given pawn is a possibility to hit
          * local array 5x5: (a -the field after beating, o-an opponent, p-the given pawn)
          * iteration of each of the arms of X shown below
@@ -146,14 +146,14 @@ public class Controller {
                 int adjacentOpponentRow = y + j;
                 int locationAfterBeatCol = adjacentOpponentCol + i;
                 int locationAfterBeatRow = adjacentOpponentRow + j;
-                /**
+                /*
                  * checking if position after beating is out of board?
                  */
                 if (locationAfterBeatCol >= 0 && locationAfterBeatRow >= 0 &&
                         locationAfterBeatRow < HEIGHT && locationAfterBeatCol < WIDTH) {
                     neighbor = table[adjacentOpponentCol][adjacentOpponentRow];
                     positionAfterBeating = table[locationAfterBeatCol][locationAfterBeatRow];
-                    /**
+                    /*
                      * is there a Pawn to hit? is there a free field to move in after hit? is there an opponent pawn?
                      */
                     if (neighbor.hasPawn() && !positionAfterBeating.hasPawn()) {
@@ -173,7 +173,7 @@ public class Controller {
         return possible;
     }
 
-    /**
+    /*
      * End of movement, changing turn and set new number of pawns
      *
      * @param pawn     used Pawn
@@ -198,7 +198,7 @@ public class Controller {
 
         String endResponse = game.whoWon();
 
-        if (endResponse !=null) {
+        if (endResponse != null) {
             return endResponse;
         }
 
@@ -209,13 +209,12 @@ public class Controller {
         List<Field> fields = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                Field checkingField = table[x][y];
-                fields.add(checkingField);
+                fields.add(table[x][y]);
+                System.out.println(table[x][y]);
             }
         }
         return fields;
     }
-
 
 
     public static List<Pawn> getListOfOneTypeOfPawns(PawnType color) {
@@ -223,7 +222,7 @@ public class Controller {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Field checkingField = table[x][y];
-                if (checkingField.hasPawn() && checkingField.getPawn().getType()==color) {
+                if (checkingField.hasPawn() && checkingField.getPawn().getType() == color) {
                     pawns.add(checkingField.getPawn());
                 }
             }
@@ -248,7 +247,7 @@ public class Controller {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Field checkingField = table[x][y];
-                if (checkingField.hasPawn() && checkingField.getPawn().getPawnNumber()==number) {
+                if (checkingField.hasPawn() && checkingField.getPawn().getPawnNumber() == number) {
                     return checkingField.getPawn();
                 }
             }
@@ -261,14 +260,13 @@ public class Controller {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 Field checkingField = table[x][y];
-                if (checkingField.hasPawn() && checkingField.getPawn().getType()==color) {
+                if (checkingField.hasPawn() && checkingField.getPawn().getType() == color) {
                     rowsOfPawns.add(checkingField.getPawn().getRow());
                 }
             }
         }
         return rowsOfPawns;
     }
-
 
 
 }

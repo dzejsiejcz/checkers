@@ -5,6 +5,8 @@ import com.kodilla.checkers.utils.PawnType;
 import java.io.Serial;
 import java.io.Serializable;
 
+import static com.kodilla.checkers.utils.Constants.START_NUMBER_OF_PAWNS;
+
 public class User implements Serializable {
 
     @Serial
@@ -12,7 +14,7 @@ public class User implements Serializable {
 
     private final String name;
     private boolean isBeating;
-    private int numbOfPawns = 4;
+    private int numbOfPawns = START_NUMBER_OF_PAWNS;
 
     private final PawnType pawnType;
 

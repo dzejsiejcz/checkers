@@ -36,7 +36,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 import java.io.*;
-import java.util.Arrays;
+
+/*
+this class creates a play board
+ */
 
 public class Checkers implements Serializable {
 
@@ -52,26 +55,26 @@ public class Checkers implements Serializable {
     public static Button btnNewGame = new Button("New game");
     public static Button btnSaveGame = new Button("Save game");
     public static Button btnContinueGame = new Button("Continue saved game");
-    public static Button btnCloseGame = new Button("Save and Exit");
+    public static Button btnSaveCloseGame = new Button("Save and Exit");
+    public static Button btnCloseGame = new Button("Exit without saving");
 
-    public static Label whoMove = new Label(rightToMove.getUserToMove() + " have to move");
-    public static Label numbRedPawnsDescribing = new Label(Texts.numbPawns);
-    public static Label numbWhitePawnsDescribing = new Label(Texts.numbPawns);
-    public static Label numbRedPawns = new Label(String.valueOf(userRed.getNumbOfPawns()));
-    public static Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
+    private final Label whoMove = new Label(rightToMove.getUserToMove() + " have to move");
+    private final Label numbRedPawnsDescribing = new Label(Texts.numbPawns);
+    private final Label numbWhitePawnsDescribing = new Label(Texts.numbPawns);
+    private final Label numbRedPawns = new Label(String.valueOf(userRed.getNumbOfPawns()));
+    private final Label numbWhitePawns = new Label(String.valueOf(userWhite.getNumbOfPawns()));
 
     private final Image board = new Image("file:src/main/resources/table.png");
     private final Group fields = new Group();
     private final Group pawns = new Group();
     private final GridPane grid = new GridPane();
     private final GridPane buttonsGrid = new GridPane();
+    private final Pane root = new Pane();
     private final Label inviting = new Label(Texts.nameOfTheGame);
     private final Label redName = new Label(Texts.reds);
     private final Label whiteName = new Label(Texts.whites);
 
-
     private int pawnNumber = 0;
-    private final Pane root = new Pane();
 
     private final Font arial40 = new Font("Arial", 40);
     private final Font arial30 = new Font("Arial", 30);
@@ -105,8 +108,20 @@ public class Checkers implements Serializable {
         /*
          * creating board with pawns in the beginning
          */
-        System.out.println(Arrays.stream(table).toList().size());
+
         if (!fromFile) {
+
+            /*
+            variables for calculate numbers of Pawns, debuggers can change numbers of creating pawns
+             */
+
+            int numbPawnsLines = START_NUMBER_OF_PAWNS / 4;
+            int startLineForReds = 3 - numbPawnsLines;
+            int endLineForWhites = 4 + numbPawnsLines;
+
+
+            System.out.println(numbPawnsLines);
+
             for (int col = 0; col < 8; col++) {
                 for (int row = 0; row < 8; row++) {
                     String color;
@@ -118,14 +133,15 @@ public class Checkers implements Serializable {
                     Field field = new Field(col, row, color);
                     fields.getChildren().add(field);
                     Pawn pawn = null;
+
                     /*
                      * pawns only on blue fields
                      */
-                    if (row == 2 && ((col + row) % 2) != 0) {
+                    if (row >= startLineForReds && row < 3 && ((col + row) % 2) != 0) {
                         pawn = makePawn(RED, col, row, pawnNumber);
                         pawnNumber++;
                     }
-                    if (row == 5 && ((col + row) % 2) != 0) {
+                    if (row <= endLineForWhites && row > 4 && ((col + row) % 2) != 0) {
                         pawn = makePawn(WHITE, col, row, pawnNumber);
                         pawnNumber++;
                     }
@@ -141,48 +157,52 @@ public class Checkers implements Serializable {
             try {
                 FileInputStream fis = new FileInputStream(SAVE_FILE);
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                userRed = (User)ois.readObject();
+                userRed = (User) ois.readObject();
                 System.out.println(userRed.toString());
-                userWhite = (User)ois.readObject();
+                userWhite = (User) ois.readObject();
                 System.out.println(userWhite.toString());
-                game = (StateOfGame)ois.readObject();
+                game = (StateOfGame) ois.readObject();
                 System.out.println(game.toString());
-                rightToMove = (RightToMove)ois.readObject();
+                rightToMove = (RightToMove) ois.readObject();
                 System.out.println(rightToMove.toString());
+
                 for (int col = 0; col < 8; col++) {
                     for (int row = 0; row < 8; row++) {
-                       String color = table[col][row].getColor();
-                       Field field = new Field(col, row, color);
-                        Field tempField = (Field)ois.readObject();
-
+                        Field tempField = (Field) ois.readObject();
                         Pawn tempPawn = tempField.getPawn();
+                        System.out.println("temp field: " + tempField);
+                        String color = tempField.getColor();
+                        Field reconstructedField = new Field(col, row, color);
                         if (tempPawn != null) {
                             PawnType type = tempPawn.getType();
                             int number = tempPawn.getPawnNumber();
-                            Pawn pawn = makePawn(type, col, row, number);
-                            field.setPawn(pawn);
-                            pawns.getChildren().add(pawn);
+                            Pawn reconstructedPawn = makePawn(type, col, row, number);
+                            reconstructedField.setPawn(reconstructedPawn);
+                            pawns.getChildren().add(reconstructedPawn);
                         }
-                        field.setPawn(tempPawn);
-                        fields.getChildren().add(field);
+                        fields.getChildren().add(reconstructedField);
+                        System.out.println("rebuilt field: " + reconstructedField);
+                        // tu był błąd - brakowało zapisu do table
+                        table[col][row] = reconstructedField;
                     }
                 }
-            ois.close();
+                ois.close();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
             System.out.println(game);
             String endResponse = game.whoWon();
             System.out.println(endResponse);
-            if (endResponse !=null) {
-                whoMove.setText(endResponse);
-            }
 
-            whoMove.setText(rightToMove.getUserToMove() + toMove);
-            numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
-            numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));
 
         }
+        if (game.whoWon() != null) {
+            whoMove.setText(game.whoWon());
+        } else {
+            whoMove.setText(rightToMove.getUserToMove() + toMove);
+        }
+        numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
+        numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));
 
         /*
          * the grid with any messages and notifications
@@ -246,14 +266,15 @@ public class Checkers implements Serializable {
          */
         //buttonsGrid.setGridLinesVisible(true);
         buttonsGrid.setAlignment(Pos.CENTER);
-        buttonsGrid.setPadding(new Insets(500, 50, 80, 100));
+        buttonsGrid.setPadding(new Insets(450, 50, 80, 100));
         buttonsGrid.setHgap(20);
         buttonsGrid.setVgap(10);
 
-        buttonsGrid.add(btnContinueGame, 1,0);
+        buttonsGrid.add(btnContinueGame, 1, 0);
         buttonsGrid.add(btnNewGame, 0, 0);
-        buttonsGrid.add(btnSaveGame, 0,1);
-        buttonsGrid.add(btnCloseGame, 1,1);
+        buttonsGrid.add(btnSaveGame, 0, 1);
+        buttonsGrid.add(btnSaveCloseGame, 1, 1);
+        buttonsGrid.add(btnCloseGame, 1, 2);
 
 
         return root;
@@ -272,19 +293,19 @@ public class Checkers implements Serializable {
             int oldRow = pawn.getRow();
             int newCol = (int) ((pawn.getLayoutX() + (TILE_SIZE / 2)) / TILE_SIZE);
             int newRow = (int) ((pawn.getLayoutY() + (TILE_SIZE / 2)) / TILE_SIZE);
-            System.out.println("newCOl " + newCol + ", newRow: " + newRow);
+            //System.out.println("newCOl " + newCol + ", newRow: " + newRow);
             MoveType result = Controller.INSTANCE.checkMove(pawn, newCol, newRow);
-            System.out.println("move type: " + result);
+            //System.out.println("move type: " + result);
             if (result == MoveType.FORBIDDEN) {
                 pawn.relocate(oldCol * TILE_SIZE, oldRow * TILE_SIZE);
-                System.out.println("Forbitten move...");
+                //System.out.println("Forbitten move...");
 
             } else if (result == MoveType.NORMAL) {
 
                 relocateToNewField(pawn, newCol, newRow, table[oldCol][oldRow]);
                 whoMove.setText(doesMovementSummary(pawn, false));
-                System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "
-                        + table[oldCol][oldRow].toString());
+//                System.out.println("table new: " + table[newCol][newRow].toString() + "table old: "
+//                        + table[oldCol][oldRow].toString());
 
             } else if (result == MoveType.KILLING) {
 
@@ -292,21 +313,32 @@ public class Checkers implements Serializable {
                 //checkBeatingForGivenPawn(pawn);
                 int neighborCol = (newCol + oldCol) / 2;
                 int neighborRow = (newRow + oldRow) / 2;
-                System.out.println("neibCol " + neighborCol + " neibRow " + neighborRow);
-                System.out.println(table[neighborCol][neighborRow].toString());
+                //System.out.println("neibCol " + neighborCol + " neibRow " + neighborRow);
+                //System.out.println(table[neighborCol][neighborRow].toString());
                 Pawn tempPawn = table[neighborCol][neighborRow].getPawn();
                 int numb = tempPawn.getPawnNumber();
-                    System.out.println("tempPawn: " + tempPawn);
+                //System.out.println("tempPawn: " + tempPawn);
+                System.out.println("lista pionków w trakcie bicia");
                 pawns.getChildren().forEach(System.out::println);
+                System.out.println("lista fields w trakcie bicia");
+                fields.getChildren().forEach(System.out::println);
                 boolean resultOfRemoving = pawns.getChildren().remove(getPawnByNumber(numb));
-                    System.out.println("przerwa " + resultOfRemoving);
-                    pawns.getChildren().forEach(System.out::println);
+                //System.out.println("przerwa " + resultOfRemoving);
+                //pawns.getChildren().forEach(System.out::println);
                 table[neighborCol][neighborRow].setPawn(null);
-                    System.out.println(table[neighborCol][neighborRow].toString());
+                System.out.println(table[neighborCol][neighborRow].toString());
                 whoMove.setText(doesMovementSummary(pawn, true));
                 numbWhitePawns.setText(String.valueOf(userWhite.getNumbOfPawns()));
                 numbRedPawns.setText(String.valueOf(userRed.getNumbOfPawns()));
             }
+            //to print list of Fields:
+            System.out.println("lista pól po wykonaniu ruchu z table");
+            getListOfFields();
+            System.out.println("lista pól po wykonaniu ruchu z GridPane:");
+            fields.getChildren().forEach(System.out::println);
+            System.out.println("lista pionków po wykonaniu ruchu z GridPane:");
+            pawns.getChildren().forEach(System.out::println);
+
 
         });
         return pawn;
@@ -319,7 +351,6 @@ public class Checkers implements Serializable {
         field.setPawn(null);
         table[newCol][newRow].setPawn(pawn);
     }
-
 
 
 }

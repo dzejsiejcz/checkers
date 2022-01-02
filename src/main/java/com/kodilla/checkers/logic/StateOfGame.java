@@ -4,11 +4,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import static com.kodilla.checkers.Checkers.userRed;
-import static com.kodilla.checkers.Checkers.userWhite;
+import static com.kodilla.checkers.Checkers.*;
 import static com.kodilla.checkers.logic.Controller.getListOfRowsOfOneTypeOfPawns;
-import static com.kodilla.checkers.model.Texts.draw;
-import static com.kodilla.checkers.model.Texts.won;
+import static com.kodilla.checkers.model.Texts.*;
 import static com.kodilla.checkers.utils.PawnType.RED;
 import static com.kodilla.checkers.utils.PawnType.WHITE;
 
@@ -29,13 +27,13 @@ public class StateOfGame implements Serializable {
         int whitePawns = userWhite.getNumbOfPawns();
         int redPawns = userRed.getNumbOfPawns();
 
-        if (whitePawns==0) {
+        if (whitePawns == 0) {
             isGame = false;
             winner = userRed.getName() + won;
             return winner;
         }
-        if (redPawns==0) {
-            isGame=false;
+        if (redPawns == 0) {
+            isGame = false;
             winner = userWhite.getName() + won;
             return winner;
         }
@@ -43,11 +41,11 @@ public class StateOfGame implements Serializable {
         List<Integer> reds = getListOfRowsOfOneTypeOfPawns(RED);
         List<Integer> whites = getListOfRowsOfOneTypeOfPawns(WHITE);
         minRowOfReds = reds.stream().sorted().toList().get(0);
-        maxRowOfWhites = whites.stream().sorted().toList().get(whites.size()-1);
+        maxRowOfWhites = whites.stream().sorted().toList().get(whites.size() - 1);
         //System.out.println("min row reds: " + minRowOfReds);
         //System.out.println("max row whites: " + maxRowOfWhites);
 
-        if (maxRowOfWhites < minRowOfReds-1 ) {
+        if (maxRowOfWhites < minRowOfReds - 1) {
             isGame = false;
             if (whitePawns > redPawns) {
                 winner = userWhite.getName() + won;
