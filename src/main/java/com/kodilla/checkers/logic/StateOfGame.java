@@ -24,6 +24,8 @@ public class StateOfGame implements Serializable {
     }
 
     public String whoWon() {
+
+
         int whitePawns = userWhite.getNumbOfPawns();
         int redPawns = userRed.getNumbOfPawns();
 

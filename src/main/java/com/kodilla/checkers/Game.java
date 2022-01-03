@@ -22,9 +22,9 @@ this class controls launching a game
 public class Game extends Application {
 
     private Checkers checkers = new Checkers(12);
-    private Scene scene = new Scene(checkers.createBoard(false));
+    private Scene scene = new Scene(checkers.createNewBoard());
 
-    private final File savedGame = new File(SAVE_FILE);
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -40,7 +40,7 @@ public class Game extends Application {
         playFour.setOnAction(event -> {
             refreshStateOfGame();
             checkers = new Checkers(4);
-            scene = new Scene(checkers.createBoard(false));
+            scene = new Scene(checkers.createNewBoard());
 
             start(primaryStage);
         });
@@ -48,21 +48,21 @@ public class Game extends Application {
         playEight.setOnAction(event -> {
             refreshStateOfGame();
             checkers = new Checkers(8);
-            scene = new Scene(checkers.createBoard(false));
+            scene = new Scene(checkers.createNewBoard());
             start(primaryStage);
         });
 
         playTwelve.setOnAction(event -> {
             refreshStateOfGame();
             checkers = new Checkers(12);
-            scene = new Scene(checkers.createBoard(false));
+            scene = new Scene(checkers.createNewBoard());
             start(primaryStage);
         });
 
         btnNewGame.setOnAction(event -> {
             refreshStateOfGame();
             checkers = new Checkers(12);
-            scene = new Scene(checkers.createBoard(false));
+            scene = new Scene(checkers.createNewBoard());
             playFour.setDisable(false);
             playEight.setDisable(false);
             playTwelve.setDisable(false);
@@ -73,7 +73,7 @@ public class Game extends Application {
 
         btnContinueGame.setOnAction(event -> {
             checkers = new Checkers();
-            scene = new Scene(checkers.createBoard(true));
+            scene = new Scene(checkers.createBoardFromFile());
             start(primaryStage);
             playFour.setDisable(true);
             playEight.setDisable(true);
@@ -104,6 +104,7 @@ public class Game extends Application {
      */
     void saveGame() {
         try {
+            File savedGame = new File(SAVE_FILE_PATH);
             FileOutputStream fos = new FileOutputStream(savedGame);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(userRed);
@@ -111,12 +112,9 @@ public class Game extends Application {
             oos.writeObject(game);
             oos.writeObject(rightToMove);
 
-
             for (Field field : getListOfFields()) {
-
                 oos.writeObject(field);
             }
-
             oos.close();
         } catch (IOException e) {
             e.printStackTrace();

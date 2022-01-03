@@ -92,7 +92,14 @@ public class Checkers implements Serializable {
 
     public Checkers(){}
 
-    public Parent createBoard(boolean fromFile) {
+    public Parent createBoardFromFile(){
+        return createBoard(true);
+    }
+    public Parent createNewBoard(){
+        return createBoard(false);
+    }
+
+    private Parent createBoard(boolean fromFile) {
 
         BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
         BackgroundImage backgroundImage =
@@ -166,7 +173,7 @@ public class Checkers implements Serializable {
         } else {
 
             try {
-                FileInputStream fis = new FileInputStream(SAVE_FILE);
+                FileInputStream fis = new FileInputStream(SAVE_FILE_PATH);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 userRed = (User) ois.readObject();
                 System.out.println(userRed.toString());
