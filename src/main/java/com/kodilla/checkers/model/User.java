@@ -5,7 +5,7 @@ import com.kodilla.checkers.utils.PawnType;
 import java.io.Serial;
 import java.io.Serializable;
 
-import static com.kodilla.checkers.utils.Constants.START_NUMBER_OF_PAWNS;
+
 
 public class User implements Serializable {
 
@@ -14,7 +14,7 @@ public class User implements Serializable {
 
     private final String name;
     private boolean isBeating;
-    private int numbOfPawns = START_NUMBER_OF_PAWNS;
+    private int numbOfPawns;
 
     private final PawnType pawnType;
 
@@ -48,6 +48,9 @@ public class User implements Serializable {
         isBeating = beating;
     }
 
+    public void setNumbOfPawns(int numbOfPawns) {
+        this.numbOfPawns = numbOfPawns;
+    }
 
     public void subtractOnePawn() {
         numbOfPawns--;

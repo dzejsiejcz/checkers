@@ -230,18 +230,6 @@ public class Controller {
         return pawns;
     }
 
-    public static List<Pawn> getListOfPawns() {
-        List<Pawn> allPawns = new ArrayList<>();
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                Field checkingField = table[x][y];
-                if (checkingField.hasPawn()) {
-                    allPawns.add(checkingField.getPawn());
-                }
-            }
-        }
-        return allPawns;
-    }
 
     public static Pawn getPawnByNumber(int number) {
         for (int x = 0; x < WIDTH; x++) {
@@ -267,6 +255,5 @@ public class Controller {
         }
         return rowsOfPawns;
     }
-
 
 }

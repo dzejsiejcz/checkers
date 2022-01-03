@@ -57,6 +57,10 @@ public class Checkers implements Serializable {
     public static Button btnContinueGame = new Button("Continue saved game");
     public static Button btnSaveCloseGame = new Button("Save and Exit");
     public static Button btnCloseGame = new Button("Exit without saving");
+    public static Button playFour = new Button("4 pawns");
+    public static Button playEight = new Button("8 pawns");
+    public static Button playTwelve = new Button("12 pawns");
+
 
     private final Label whoMove = new Label(rightToMove.getUserToMove() + " have to move");
     private final Label numbRedPawnsDescribing = new Label(Texts.numbPawns);
@@ -75,17 +79,27 @@ public class Checkers implements Serializable {
     private final Label whiteName = new Label(Texts.whites);
 
     private int pawnNumber = 0;
+    private int startPawnNumber = 12;
 
     private final Font arial40 = new Font("Arial", 40);
     private final Font arial30 = new Font("Arial", 30);
     private final Font arial20 = new Font("Arial", 20);
 
 
-    public Checkers() {
-
+    public Checkers(int startPawnNumber) {
+        this.startPawnNumber = startPawnNumber;
     }
 
-    public Parent createBoard(boolean fromFile) {
+    public Checkers(){}
+
+    public Parent createBoardFromFile(){
+        return createBoard(true);
+    }
+    public Parent createNewBoard(){
+        return createBoard(false);
+    }
+
+    private Parent createBoard(boolean fromFile) {
 
         BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
         BackgroundImage backgroundImage =
@@ -115,9 +129,12 @@ public class Checkers implements Serializable {
             variables for calculate numbers of Pawns, debuggers can change numbers of creating pawns
              */
 
-            int numbPawnsLines = START_NUMBER_OF_PAWNS / 4;
+            int numbPawnsLines = startPawnNumber / 4;
             int startLineForReds = 3 - numbPawnsLines;
             int endLineForWhites = 4 + numbPawnsLines;
+
+            userRed.setNumbOfPawns(startPawnNumber);
+            userWhite.setNumbOfPawns(startPawnNumber);
 
 
             System.out.println(numbPawnsLines);
@@ -154,8 +171,9 @@ public class Checkers implements Serializable {
             }
 
         } else {
+
             try {
-                FileInputStream fis = new FileInputStream(SAVE_FILE);
+                FileInputStream fis = new FileInputStream(SAVE_FILE_PATH);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 userRed = (User) ois.readObject();
                 System.out.println(userRed.toString());
@@ -266,15 +284,18 @@ public class Checkers implements Serializable {
          */
         //buttonsGrid.setGridLinesVisible(true);
         buttonsGrid.setAlignment(Pos.CENTER);
-        buttonsGrid.setPadding(new Insets(450, 50, 80, 100));
+        buttonsGrid.setPadding(new Insets(350, 50, 80, 100));
         buttonsGrid.setHgap(20);
         buttonsGrid.setVgap(10);
 
-        buttonsGrid.add(btnContinueGame, 1, 0);
-        buttonsGrid.add(btnNewGame, 0, 0);
-        buttonsGrid.add(btnSaveGame, 0, 1);
-        buttonsGrid.add(btnSaveCloseGame, 1, 1);
-        buttonsGrid.add(btnCloseGame, 1, 2);
+        buttonsGrid.add(playFour,0,0);
+        buttonsGrid.add(playEight,0,1);
+        buttonsGrid.add(playTwelve,0,2);
+        buttonsGrid.add(btnContinueGame, 1, 4);
+        buttonsGrid.add(btnNewGame, 0, 4);
+        buttonsGrid.add(btnSaveGame, 0, 5);
+        buttonsGrid.add(btnSaveCloseGame, 1, 5);
+        buttonsGrid.add(btnCloseGame, 1, 6);
 
 
         return root;
@@ -288,6 +309,10 @@ public class Checkers implements Serializable {
          */
 
         pawn.setOnMouseReleased(event -> {
+
+            playFour.setDisable(true);
+            playEight.setDisable(true);
+            playTwelve.setDisable(true);
 
             int oldCol = pawn.getCol();
             int oldRow = pawn.getRow();
